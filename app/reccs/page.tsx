@@ -2,12 +2,15 @@ import { getMyReccs } from "@/lib/recc-action"
 import Link from "next/link";
 
 const page = async () => {
-  const reccs = await getMyReccs();
+  const {reccs, count} = await getMyReccs();
 
   return (
     <div className="w-full flex justify-center items-center">
       <div className="px-4 md:px-8 py-4 flex flex-col gap-4 lg:w-[60vw]">
-          {reccs.map((recc) => (
+        <div>
+          Number of reccomendations : {count}
+        </div>
+        {reccs.map((recc) => (
           <div key={recc.id} className="border-1 border-zinc-800 px-4 py-2 rounded-sm flex flex-col">
             <h3 className="text-lg uppercase mb-2">{recc.title}</h3>
             <p className="mb-4">{recc.description}</p>

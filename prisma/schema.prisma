@@ -21,6 +21,7 @@ model User {
   username      String?  @unique
   bio           String?
 
+  reccCount     Int @default(0)
   reccs         Recc[]
   comments      Comment[]
   likes         Like[]

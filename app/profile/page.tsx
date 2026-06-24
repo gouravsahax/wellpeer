@@ -28,6 +28,11 @@ const page = async () => {
         </div>
       </div>
 
+      <div className="flex gap-2">
+        <h1>Number of reccomendations : </h1>
+        <h2>{data?.reccCount}</h2>
+      </div>
+
       <form action={SignOut}>
         <button className="cursor-pointer px-2 py-1 border-1 border-white hover:bg-white hover:text-black rounded-sm text-md mt-4" type="submit">SignOut</button>
       </form>
