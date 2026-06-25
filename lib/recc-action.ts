@@ -8,9 +8,6 @@ import { revalidatePath } from "next/cache";
 export async function createRecc(data: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
-
-  // console.log(data)
-
   const title = String(data.get("title") ?? "").trim();
   const desc = String(data.get("desc") ?? "").trim();
   const url = String(data.get("url") ?? "").trim();

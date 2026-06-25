@@ -1,5 +1,4 @@
 import Link from "next/link";
-import HomeNav from "./components/HomeNav";
 import { getAllRecs } from "@/lib/recc-action";
 import { ThumbsUp, MessageCircle } from "lucide-react";
 
@@ -9,7 +8,6 @@ export default async function Home() {
   return (
     <div className="w-screen flex flex-col items-center">
       <div className="w-full min-h-screen lg:w-[40vw] flex flex-col border-x border-zinc-800">
-        <HomeNav />
 
         <div className="w-full flex flex-col">
           {reccs.length === 0 ? (

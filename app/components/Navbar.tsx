@@ -12,11 +12,8 @@ const Navbar = () => {
         <span className="sm:hidden">dr</span>
         <span className="hidden sm:inline">DeepRecc</span>
         <div className='flex gap-6'>
-          <Link href='/' className={`py-2 + ${path === '/' || path === '/following' ? 'border-b-2 border-white' : ''}`} >
+          <Link href='/' className={`py-2 + ${path === '/' ? 'border-b-2 border-white' : ''}`} >
               home
-          </Link>
-          <Link href='/follow' className={`py-2 + ${path === '/follow' ? 'border-b-2 border-white' : ''}`}>
-              follow
           </Link>
           <Link href='/reccs' className={`py-2 + ${path === '/reccs' ? 'border-b-2 border-white' : ''}`}>
               my reccs

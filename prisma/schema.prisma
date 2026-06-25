@@ -26,11 +26,6 @@ model User {
   comments      Comment[]
   likes         Like[]
 
-  followerCount  Int @default(0)
-  followingCount Int @default(0)
-  followers      Follow[] @relation("Following")
-  following      Follow[] @relation("Follower")
-
   accounts      Account[]
   sessions      Session[]
 
@@ -117,14 +112,4 @@ model Like {
   recc      Recc @relation(fields: [reccId], references: [id], onDelete: Cascade)
 
   @@id([userId, reccId])
-}
-
-model Follow {
-  followerId  String
-  followingId String
-
-  follower    User @relation("Follower", fields: [followerId], references: [id])
-  following   User @relation("Following", fields: [followingId], references: [id])
-
-  @@id([followerId, followingId])
 }
