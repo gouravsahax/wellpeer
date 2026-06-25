@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getAllRecs } from "@/lib/recc-action";
-import { ThumbsUp } from "lucide-react";
 import ReccImage from "./components/ReccImage";
+import LikeButton from "./components/LikeButton";
 
 export default async function Home() {
   const reccs = await getAllRecs();
@@ -21,7 +21,6 @@ export default async function Home() {
                 key={recc.id}
                 className="border border-zinc-800 rounded-xl px-4 py-4 mb-4 break-inside-avoid bg-zinc-950/40"
               >
-                {/* Header: username → recommended a [type link] */}
                 <div className="flex items-center gap-2 text-sm text-zinc-400 mb-3">
                   <span className="text-white font-medium">
                     {recc.user.name ?? "Unknown"}
@@ -33,7 +32,7 @@ export default async function Home() {
                       <Link
                         href={recc.url}
                         target="_blank"
-                        className="text-white underline underline-offset-2"
+                        className="text-blue-300 underline underline-offset-2"
                       >
                         {recc.type}
                       </Link>
@@ -43,7 +42,6 @@ export default async function Home() {
                   </span>
                 </div>
 
-                {/* Body */}
                 <h2 className="text-base font-semibold text-white">
                   {recc.title}
                 </h2>
@@ -57,12 +55,12 @@ export default async function Home() {
                   <ReccImage src={recc.imageUrl} alt={recc.title} />
                 )}
 
-                {/* Footer */}
                 <div className="mt-4 flex items-center gap-5 text-sm text-zinc-400">
-                  <span className="flex items-center gap-1.5">
-                    <ThumbsUp size={14} />
-                    {recc.likeCount}
-                  </span>
+                  <LikeButton
+                    reccId={recc.id}
+                    initialLikeCount={recc.likeCount}
+                    initialHasLiked={Boolean(recc.likes && recc.likes.length > 0)}
+                  />
                   <span className="ml-auto">
                     {new Date(recc.createdAt).toLocaleDateString()}
                   </span>

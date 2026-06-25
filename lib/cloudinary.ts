@@ -11,7 +11,6 @@ export async function uploadImage(file: File): Promise<string> {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
   
-  // Convert buffer to base64 data URI
   const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
   
   const response = await cloudinary.uploader.upload(base64Image, {

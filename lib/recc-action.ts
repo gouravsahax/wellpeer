@@ -52,6 +52,9 @@ export async function createRecc(data: FormData) {
 }
 
 export async function getAllRecs() {
+  const session = await auth();
+  const userId = session?.user?.id;
+
   return await prisma.recc.findMany({
     orderBy: {
       createdAt: "desc",
@@ -72,6 +75,12 @@ export async function getAllRecs() {
           name: true,
         },
       },
+      likes: userId
+        ? {
+            where: { userId },
+            select: { userId: true },
+          }
+        : false,
     },
   });
 }
@@ -222,4 +231,55 @@ export async function deleteRecc(reccId: string) {
   );
 
   revalidatePath("/reccs");
+}
+
+export async function toggleLike(reccId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const userId = session.user.id;
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const existingLike = await tx.like.findUnique({
+        where: {
+          userId_reccId: {
+            userId,
+            reccId,
+          },
+        },
+      });
+
+      if (existingLike) {
+        await tx.like.delete({
+          where: {
+            userId_reccId: {
+              userId,
+              reccId,
+            },
+          },
+        });
+        await tx.recc.update({
+          where: { id: reccId },
+          data: { likeCount: { decrement: 1 } },
+        });
+      } else {
+        await tx.like.create({
+          data: {
+            userId,
+            reccId,
+          },
+        });
+        await tx.recc.update({
+          where: { id: reccId },
+          data: { likeCount: { increment: 1 } },
+        });
+      }
+    });
+
+    revalidatePath("/");
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to toggle like");
+  }
 }

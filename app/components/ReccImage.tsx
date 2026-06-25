@@ -17,7 +17,6 @@ export default function ReccImage({ src, alt }: ReccImageProps) {
       if (e.key === 'Escape') setIsOpen(false);
     };
     window.addEventListener('keydown', handleKeyDown);
-    // Disable scrolling when modal is open
     document.body.style.overflow = 'hidden';
     
     return () => {
@@ -28,7 +27,6 @@ export default function ReccImage({ src, alt }: ReccImageProps) {
 
   return (
     <>
-      {/* 16:9 Image Preview in feed */}
       <div 
         onClick={() => setIsOpen(true)}
         className="mt-3 overflow-hidden rounded-lg border border-zinc-800/80 cursor-pointer group relative aspect-video w-full bg-zinc-950 flex items-center justify-center"
@@ -39,7 +37,6 @@ export default function ReccImage({ src, alt }: ReccImageProps) {
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-103"
           loading="lazy"
         />
-        {/* Hover overlay indicator */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
           <div className="bg-zinc-900/90 border border-zinc-800 p-2 rounded-full text-white flex items-center gap-1.5 text-xs font-medium shadow-lg scale-95 group-hover:scale-100 transition-transform duration-250">
             <ZoomIn className="w-4 h-4" />
@@ -48,13 +45,11 @@ export default function ReccImage({ src, alt }: ReccImageProps) {
         </div>
       </div>
 
-      {/* Fullscreen Popup Modal */}
       {isOpen && (
         <div 
           onClick={() => setIsOpen(false)}
           className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 animate-fade-in"
         >
-          {/* Close button */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -66,7 +61,6 @@ export default function ReccImage({ src, alt }: ReccImageProps) {
             <X className="w-5 h-5" />
           </button>
 
-          {/* Full Image */}
           <div 
             onClick={(e) => e.stopPropagation()} 
             className="relative max-w-full max-h-full flex items-center justify-center"

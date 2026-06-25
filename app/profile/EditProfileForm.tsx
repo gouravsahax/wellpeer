@@ -65,7 +65,6 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
 
   return (
     <div className="w-full max-w-md bg-black backdrop-blur-lg border border-zinc-800 rounded-sm p-8 shadow-2xl transition-all duration-300 hover:border-zinc-700/80">
-      {/* Profile Header (Avatar and Name) */}
       <div className="flex flex-col items-center mb-6">
         <div className="relative group mb-4">
           <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-zinc-800 via-zinc-700 to-zinc-600 flex items-center justify-center text-white text-3xl font-semibold shadow-inner border-2 border-zinc-700 select-none">
@@ -81,7 +80,6 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
           </div>
         </div>
 
-        {/* Name Display / Editing Form */}
         {isEditing ? (
           <form onSubmit={handleSave} className="w-full flex flex-col items-center gap-2">
             <div className="w-full flex items-center gap-2">
@@ -135,9 +133,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
 
       <hr className="border-zinc-800 my-6" />
 
-      {/* User Information Grid */}
       <div className="space-y-4 text-zinc-300">
-        {/* Email Field */}
         <div className="flex items-center gap-3 px-3 py-2 bg-zinc-950/40 border border-zinc-900 rounded-xl">
           <Mail className="w-5 h-5 text-zinc-500 shrink-0" />
           <div className="flex flex-col min-w-0">
@@ -146,7 +142,6 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
           </div>
         </div>
 
-        {/* Stats field */}
         <div className="flex items-center gap-3 px-3 py-2 bg-zinc-950/40 border border-zinc-900 rounded-xl">
           <Award className="w-5 h-5 text-zinc-500 shrink-0" />
           <div className="flex flex-col">
@@ -156,7 +151,6 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
         </div>
       </div>
 
-      {/* Action Footer */}
       <div className="mt-8 flex flex-col gap-3">
         <form action={SignOut} className="w-full">
           <button
