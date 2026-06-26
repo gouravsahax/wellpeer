@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+build
+.git
+.gitignore
+Dockerfile
+.dockerignore
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

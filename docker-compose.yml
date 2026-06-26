@@ -1,0 +1,15 @@
+services:
+  app:
+    image: gouravsaha/peerproducts:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - AUTH_SECRET=lijadhv87svhdfbvaw8oe87rvbaevsu
+      - AUTH_TRUST_HOST=true
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+    command: sh -c "npx prisma migrate deploy && npm start"
