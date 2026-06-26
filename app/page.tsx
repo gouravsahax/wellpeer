@@ -10,6 +10,60 @@ export const metadata: Metadata = {
   description: "Browse genuine product recommendations from the PeerProducts community.",
 };
 
+function ReccCard({ recc }: { recc: any }) {
+  return (
+    <article
+      key={recc.id}
+      className="border border-zinc-800 rounded-xl px-4 py-4 bg-zinc-950/40 flex flex-col gap-3"
+    >
+      <div className="flex items-center gap-2 text-sm text-zinc-400">
+        <span className="text-white font-medium">
+          {recc.user.name ?? "Unknown"}
+        </span>
+        <span>→</span>
+        <span>
+          recommended a{" "}
+          {recc.url ? (
+            <Link
+              href={recc.url}
+              target="_blank"
+              className="text-blue-300 underline underline-offset-2"
+            >
+              {recc.type}
+            </Link>
+          ) : (
+            <span className="text-white">{recc.type}</span>
+          )}
+        </span>
+      </div>
+
+      <h2 className="text-base font-semibold text-white">
+        {recc.title}
+      </h2>
+      {recc.description && (
+        <p className="text-sm text-zinc-400 mt-1">
+          {recc.description}
+        </p>
+      )}
+
+      {recc.imageUrl && (
+        <ReccImage src={recc.imageUrl} alt={recc.title} />
+      )}
+
+      <div className="mt-2 flex items-center gap-5 text-sm text-zinc-400">
+        <LikeButton
+          reccId={recc.id}
+          initialLikeCount={recc.likeCount}
+          initialHasLiked={Boolean(recc.likes && recc.likes.length > 0)}
+        />
+        <span className="ml-auto">
+          {new Date(recc.createdAt).toLocaleDateString()}
+        </span>
+      </div>
+    </article>
+  );
+}
+
 export default async function Home({
   searchParams,
 }: {
@@ -26,6 +80,10 @@ export default async function Home({
   const { reccs, totalPages } = await getAllRecs(currentPage, 8, search);
 
   const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
+
+  // Split into left and right columns for desktop masonry
+  const col1 = reccs.filter((_, idx) => idx % 2 === 0);
+  const col2 = reccs.filter((_, idx) => idx % 2 !== 0);
 
   return (
     <div className="w-screen flex flex-col items-center">
@@ -59,65 +117,36 @@ export default async function Home({
           </form>
         </div>
 
-        <div className="w-full columns-1 md:columns-2 gap-4 p-4">
-          {reccs.length === 0 ? (
-            <p className="px-4 py-8 text-center text-zinc-400 col-span-2">
-              No recommendations found.
-            </p>
-          ) : (
-            reccs.map((recc) => (
-              <article
-                key={recc.id}
-                className="border border-zinc-800 rounded-xl px-4 py-4 mb-4 break-inside-avoid bg-zinc-950/40"
-              >
-                <div className="flex items-center gap-2 text-sm text-zinc-400 mb-3">
-                  <span className="text-white font-medium">
-                    {recc.user.name ?? "Unknown"}
-                  </span>
-                  <span>→</span>
-                  <span>
-                    recommended a{" "}
-                    {recc.url ? (
-                      <Link
-                        href={recc.url}
-                        target="_blank"
-                        className="text-blue-300 underline underline-offset-2"
-                      >
-                        {recc.type}
-                      </Link>
-                    ) : (
-                      <span className="text-white">{recc.type}</span>
-                    )}
-                  </span>
-                </div>
+        {reccs.length === 0 ? (
+          <div className="w-full p-8 text-center text-zinc-400">
+            No recommendations found.
+          </div>
+        ) : (
+          <>
+            {/* Mobile Layout (Single flat column) */}
+            <div className="w-full flex flex-col gap-4 p-4 md:hidden">
+              {reccs.map((recc) => (
+                <ReccCard key={recc.id} recc={recc} />
+              ))}
+            </div>
 
-                <h2 className="text-base font-semibold text-white">
-                  {recc.title}
-                </h2>
-                {recc.description && (
-                  <p className="text-sm text-zinc-400 mt-1">
-                    {recc.description}
-                  </p>
-                )}
-
-                {recc.imageUrl && (
-                  <ReccImage src={recc.imageUrl} alt={recc.title} />
-                )}
-
-                <div className="mt-4 flex items-center gap-5 text-sm text-zinc-400">
-                  <LikeButton
-                    reccId={recc.id}
-                    initialLikeCount={recc.likeCount}
-                    initialHasLiked={Boolean(recc.likes && recc.likes.length > 0)}
-                  />
-                  <span className="ml-auto">
-                    {new Date(recc.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </article>
-            ))
-          )}
-        </div>
+            {/* Desktop Layout (Masonry 2 columns) */}
+            <div className="w-full hidden md:grid grid-cols-2 gap-4 p-4 items-start">
+              {/* Left Column */}
+              <div className="flex flex-col gap-4">
+                {col1.map((recc) => (
+                  <ReccCard key={recc.id} recc={recc} />
+                ))}
+              </div>
+              {/* Right Column */}
+              <div className="flex flex-col gap-4">
+                {col2.map((recc) => (
+                  <ReccCard key={recc.id} recc={recc} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Pagination Controls */}
         {totalPages > 1 && (

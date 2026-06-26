@@ -6,77 +6,79 @@ import { redirect } from "next/navigation";
 import { updateTag, unstable_cache } from "next/cache";
 import { uploadImage } from "./cloudinary";
 
-const getCachedAllRecs = unstable_cache(
-  async (uid?: string, skip?: number, take?: number, search?: string) => {
-    const where = search
-      ? {
-          type: {
-            contains: search,
-            mode: "insensitive" as const,
-          },
-        }
-      : {};
+const getCachedPaginatedRecs = (
+  page: number,
+  limit: number,
+  search: string,
+  userId?: string
+) => {
+  return unstable_cache(
+    async () => {
+      const skip = (page - 1) * limit;
+      
+      const countWhere = search
+        ? {
+            type: {
+              contains: search,
+              mode: "insensitive" as const,
+            },
+          }
+        : {};
 
-    return await prisma.recc.findMany({
-      where,
-      skip,
-      take,
-      orderBy: {
-        createdAt: "desc",
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        url: true,
-        imageUrl: true,
-        type: true,
-        likeCount: true,
-        createdAt: true,
-        userId: true,
+      const [total, results] = await Promise.all([
+        prisma.recc.count({ where: countWhere }),
+        prisma.$queryRaw<any[]>`
+          SELECT 
+            r.id,
+            r.title,
+            r.description,
+            r.url,
+            r."imageUrl",
+            r.type,
+            r."likeCount",
+            r."createdAt",
+            r."userId",
+            u.name AS "userName",
+            l."userId" AS "likedByCurrentUser"
+          FROM "Recc" r
+          LEFT JOIN "User" u ON r."userId" = u.id
+          LEFT JOIN "Like" l ON r.id = l."reccId" AND l."userId" = ${userId || ''}
+          WHERE r.type ILIKE ${'%' + search + '%'}
+          ORDER BY GREATEST(-100.0, CAST(r."likeCount" AS DOUBLE PRECISION) - (EXTRACT(EPOCH FROM (timezone('utc', now()) - r."createdAt")) / 86400.0) * 0.1) DESC
+          LIMIT ${limit} OFFSET ${skip}
+        `
+      ]);
 
+      const mappedResults = results.map((row) => ({
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        url: row.url,
+        imageUrl: row.imageUrl,
+        type: row.type,
+        likeCount: row.likeCount,
+        createdAt: row.createdAt,
+        userId: row.userId,
         user: {
-          select: {
-            name: true,
-          },
+          name: row.userName,
         },
-        likes: uid
-          ? {
-              where: { userId: uid },
-              select: { userId: true },
-            }
-          : false,
-      },
-    });
-  },
-  ["all-reccs"],
-  {
-    tags: ["reccs"],
-    revalidate: 3600,
-  }
-);
+        likes: row.likedByCurrentUser
+          ? [{ userId: row.likedByCurrentUser }]
+          : [],
+      }));
 
-const getCachedRecsCount = unstable_cache(
-  async (search?: string) => {
-    const where = search
-      ? {
-          type: {
-            contains: search,
-            mode: "insensitive" as const,
-          },
-        }
-      : {};
-
-    return await prisma.recc.count({
-      where,
-    });
-  },
-  ["reccs-count"],
-  {
-    tags: ["reccs"],
-    revalidate: 3600,
-  }
-);
+      return {
+        reccs: mappedResults,
+        total,
+      };
+    },
+    ["paginated-reccs", String(page), String(limit), search, userId || "anonymous"],
+    {
+      tags: ["reccs"],
+      revalidate: 3600,
+    }
+  )();
+};
 
 const getCachedMyReccs = unstable_cache(
   async (userId: string) => {
@@ -159,13 +161,8 @@ export async function createRecc(data: FormData) {
 export async function getAllRecs(page = 1, limit = 8, search = "") {
   const session = await auth();
   const userId = session?.user?.id;
-  const skip = (page - 1) * limit;
-  const take = limit;
 
-  const [reccs, total] = await Promise.all([
-    getCachedAllRecs(userId || "anonymous", skip, take, search),
-    getCachedRecsCount(search),
-  ]);
+  const { reccs, total } = await getCachedPaginatedRecs(page, limit, search, userId);
 
   return {
     reccs,

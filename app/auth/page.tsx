@@ -43,7 +43,7 @@ export default function AuthPage() {
       </div>
 
       {/* Branding and Authentication (Right Column) */}
-      <div className="flex flex-col justify-center items-start text-left w-full lg:max-w-lg gap-6">
+      <div className="flex flex-col justify-center items-start text-left w-full lg:max-w-lg gap-6 lg:-mr-[5vw]">
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
           PeerProducts
         </h1>
